@@ -12,36 +12,19 @@
         android:layout_weight="0.63"
         android:src="@drawable/ic_launcher1" />
 
-    <LinearLayout
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|left"
-        android:orientation="horizontal" >
-
+    
         <Button
-            android:id="@+id/button1"
+            android:id="@+id/button3"
             style="?android:attr/buttonStyleSmall"
             android:layout_width="195dp"
             android:layout_height="wrap_content"
             android:text="Start Recognition" />
-    </LinearLayout>
+    
 
-    <LinearLayout
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|left"
-        android:orientation="horizontal" >
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|left"
-        android:orientation="horizontal" >
-    </LinearLayout>
+   
 
     <Button
-        android:id="@+id/button1"
+        android:id="@+id/button2"
         style="?android:attr/buttonStyleSmall"
         android:layout_width="195dp"
         android:layout_height="wrap_content"
