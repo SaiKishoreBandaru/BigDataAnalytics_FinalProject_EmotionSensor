@@ -2,62 +2,100 @@ package com.example.whattodo;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
-import org.apache.http.StatusLine;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
-
-
-
-
-
+//import android.R;
+import android.os.AsyncTask;
 import android.app.Activity;
-import android.app.ActionBar;
 import android.app.Fragment;
+import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothManager;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
+import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.webkit.WebView;
 import android.widget.Button;
-import android.os.Build;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 public class MainActivity extends Activity {
 
+	   public String emotion="";
+	   String text="";
+
+	   
+	   TextView info;
+	  ConnectionService c=new ConnectionService();
+	  
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-
+		//super.onCreate();
+		Log.i("itc ","itcame here");
+		BluetoothManager manager = (BluetoothManager) getSystemService(BLUETOOTH_SERVICE);
+       c.mBluetoothAdapter = manager.getAdapter();
+        c.mDevices = new SparseArray<BluetoothDevice>();
 		if (savedInstanceState == null) {
 			//getFragmentManager().beginTransaction()
 					//.add(R.id.container, new PlaceholderFragment()).commit();
 		}
 		
 		Button b3,b2;
-		
-		b2=(Button)findViewById(R.id.button2);
+	 //button 3 start
+		//button2 detect
+		//button1 end
+		b2=(Button)findViewById(R.id.button1);
 		b2.setOnClickListener(new View.OnClickListener() {
-
 			@Override
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
+				c.stopScan();
+//				/c.SaveData(c.temp);
+				
 				
 			}
 		});
 
-		b3 = (Button)findViewById(R.id.button1);
+		
+		
+		 
+			b2=(Button)findViewById(R.id.button3);
+			b2.setOnClickListener(new View.OnClickListener() {
+
+				@Override
+				public void onClick(View v) {
+					// TODO Auto-generated method stub
+					c.startScan();
+					
+				}
+			});
+		
+			
+
+			b2=(Button)findViewById(R.id.button4);
+			b2.setOnClickListener(new View.OnClickListener() {
+
+				@Override
+				public void onClick(View v) {
+					// TODO Auto-generated method stub
+
+					Intent intent = new Intent(MainActivity.this, Report.class);
+			        startActivity(intent);
+					
+				}
+			});
+		
+		
+		b3 = (Button)findViewById(R.id.button2);
 		b3.setOnClickListener(new View.OnClickListener() {
 
 			@Override
@@ -67,41 +105,40 @@ public class MainActivity extends Activity {
 				 setContentView(webview);
 				 webview.loadUrl("http://134.193.136.147:8080/HbaseWS/jaxrs/generic/hbaseRetrieveAll/CRUD");
 */
-				HttpClient dClientRequest = new DefaultHttpClient();
 				
-				InputStream resultStream = null;
-				
-				String s="";
-				
-				try {
+				/*new Thread(new Runnable()
+				{
+
+				@Override
+				public void run() {
+					// TODO Auto-generated method stub
+					//String url ="http://134.193.136.127:8983/solr/collection1_shard1_replica1/select?q=state_s%3AAL&rows=100&wt=json&indent=true";
+					String url = "http://134.193.136.147:8080/HMMWS/jaxrs/generic/HMMTrainingTest/-home-group8-Stomp.seq:-home-group8-Facepalm.seq/stomp:facepalm/-home-group8-emotion.seq";
 					
-					HttpGet hpURL = new HttpGet("http://192.168.199.128:8080/HMMWS/jaxrs/generic/HMMTrainingTest/-home-cloudera-Stomp.seq:-home-cloudera-Facepalm.seq/stomp:facepalm/-home-cloudera-Test.seq");
-				   HttpResponse hrWebResponse = dClientRequest.execute(hpURL);
-				    StatusLine statusLine = hrWebResponse.getStatusLine();
-				    if(statusLine.getStatusCode() == HttpStatus.SC_OK)
-				    {
-				    HttpEntity heWebEntity = hrWebResponse.getEntity();
-				    resultStream = heWebEntity.getContent();
-				    BufferedReader bReader = new BufferedReader(new InputStreamReader(resultStream, "UTF-8"), 8);
-				    StringBuilder sb = new StringBuilder();
-				    
-				    while((s = bReader.readLine()) != null)
-				    {
-				        sb.append(s + "\n");
-				        //rEditText.setText(s);
-				        
-				        Log.i("conetxt",sb.toString());
-				        
-				    }
-				    }
-				    
-				} catch (Exception e) { 
-					e.printStackTrace();
-				
+					BackgroundTask bt=new BackgroundTask();
+					bt.doInBackground(url);					
 				}
 				
+				}).start();*/
+				
+				
+				
+				
+				TestGesture t=new TestGesture();
+				
+				
+				/*TextView info1;
+				info1=(TextView)findViewById(R.id.info);
+				info1.setText("you are happy"+text);
+				ImageView i;
+				i=(ImageView)findViewById(R.id.imageView1);
+				i.setImageResource(R.drawable.ic_launcher);
+				Log.i("output", text);*/
 				
 
+				Intent intent = new Intent(MainActivity.this, Emotion.class);
+		        startActivity(intent);
+				
 			}
 		});
 	}
@@ -143,4 +180,90 @@ public class MainActivity extends Activity {
 		}
 	}
 
+
+
+
+public class BackgroundTask extends AsyncTask<String, String, String>{
+
+	
+	@Override
+    protected String doInBackground(String... params) {		   
+         String command=params[0]; // URL to call			                 
+         String response="";
+         
+     
+         try {   	  
+         response = executeCommand(command); 			         
+         //JSONObject responeObj = new JSONObject(response);         
+         //JSONObject response2 = (JSONObject) responeObj.get("response");         
+         //JSONArray docs= (JSONArray) response2.get("docs"); 
+         emotion=response;
+     //info=(TextView)findViewById(R.id.info);
+         /*if(docs.length()>0)
+         { */       	 
+        	 
+        	 MainActivity.this.runOnUiThread(new Runnable() {
+				
+				@Override
+				public void run() {
+					
+					if(emotion.contains("facepalm"))
+					{
+						info.setText("you are irritated");	
+						ImageView i;
+						i=(ImageView)findViewById(R.id.imageView1);
+						i.setImageResource(R.drawable.ic_launcher1);
+					}
+					
+					else if(emotion.contains("stomp"))
+					{
+						info.setText("you are angry");	
+					}
+					
+					else
+					 info.setText("you are happy");
+				//info.setText(emotion);
+				}
+			});
+        	
+        	 
+         		         
+             
+         }catch (Exception ex) {
+             System.out.println("error!!");
+             Log.i("url response", "IN Catch");
+             ex.printStackTrace();
+         }
+        
+         return emotion; 
+    }
+	
+	private String executeCommand(String command) {
+	   	 
+		StringBuffer output = new StringBuffer();
+		String output1="";
+		String line="";
+		try {
+			
+			 URL url = new URL(command);						
+			 HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();         
+	         BufferedReader br = new BufferedReader(new InputStreamReader((urlConnection.getInputStream())));
+	         while ((line = br.readLine())!= null) {
+					output.append(line + "\n");	
+					if(line.contains("gesture is"))
+					output1=line;
+				}		
+			
+ 
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+ 
+		return output1+output.toString();
+ 
+	}
+	
+	
+}
+	
 }

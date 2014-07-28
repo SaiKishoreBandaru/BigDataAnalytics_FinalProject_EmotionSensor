@@ -4,5 +4,11 @@
     <string name="app_name">WhatToDo</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
-
+<string-array name="place_type">
+        <item>shopping_mall</item>
+        <item>restaurant</item>
+        <item>movie_theater</item>
+         <item>park</item>
+        <item>church</item>
+    </string-array>
 </resources>
