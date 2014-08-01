@@ -6,6 +6,10 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+
+//import com.example.sample.ConnectionService;
+
+
 //import android.R;
 import android.os.AsyncTask;
 import android.app.Activity;
@@ -30,16 +34,22 @@ public class MainActivity extends Activity {
 
 	   public String emotion="";
 	   String text="";
-
+	   public static TestGesture t=new TestGesture();
 	   
-	   TextView info;
-	  ConnectionService c=new ConnectionService();
+	   TextView info,s;
+	 public static ConnectionService c=new ConnectionService();
 	  
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		//super.onCreate();
+		
+		//s.setText("Initializing......");
+	t.train();
+	//TextView s;
+	s=(TextView)findViewById(R.id.it);
+	s.setText("Start");
 		Log.i("itc ","itcame here");
 		BluetoothManager manager = (BluetoothManager) getSystemService(BLUETOOTH_SERVICE);
        c.mBluetoothAdapter = manager.getAdapter();
@@ -58,7 +68,7 @@ public class MainActivity extends Activity {
 			@Override
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
-				c.stopScan();
+			c.stopScan();
 //				/c.SaveData(c.temp);
 				
 				
@@ -74,7 +84,9 @@ public class MainActivity extends Activity {
 				@Override
 				public void onClick(View v) {
 					// TODO Auto-generated method stub
-					c.startScan();
+					//c.startScan();
+				
+					startService(new Intent(MainActivity.this,ConnectionService.class));
 					
 				}
 			});
@@ -124,9 +136,9 @@ public class MainActivity extends Activity {
 				
 				
 				
-				TestGesture t=new TestGesture();
-				
-				
+				//TestGesture t=new TestGesture();
+				//s=(TextView)findViewById(R.id.it);
+				//s.setText("Processing.......");
 				/*TextView info1;
 				info1=(TextView)findViewById(R.id.info);
 				info1.setText("you are happy"+text);
@@ -177,6 +189,18 @@ public class MainActivity extends Activity {
 			View rootView = inflater.inflate(R.layout.fragment_main, container,
 					false);
 			return rootView;
+	
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
 		}
 	}
 

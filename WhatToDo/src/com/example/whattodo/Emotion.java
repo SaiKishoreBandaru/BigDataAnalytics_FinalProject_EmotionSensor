@@ -17,7 +17,7 @@ import android.widget.TextView;
 public class Emotion extends Activity {
 	
 	public static String op="";
-	
+	public static TestGesture t=new TestGesture();
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -26,7 +26,7 @@ public class Emotion extends Activity {
 		setContentView(R.layout.emotion);
 		//super.onCreate();
 		Log.i("itc ","itcame here");
-		TestGesture t=new TestGesture();
+	
 		 String root = Environment.getExternalStorageDirectory().toString();
 		 File myDir = new File(root + "/Data");
 		File seqfilename=new File(myDir,"emotion.seq");
@@ -34,8 +34,13 @@ public class Emotion extends Activity {
 		
 		
 		try {
-			t.train();
-			op=t.test(seqfilename);
+			op="";
+			//t.train();
+			
+			//MainActivity.t.train();
+			//op=MainActivity.TELEPHONY_SERVICE.
+			op=MainActivity.t.test(seqfilename);
+			
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			
@@ -104,11 +109,11 @@ public class Emotion extends Activity {
 		else
 		{
 		info1=(TextView)findViewById(R.id.info1);
-		info1.setText("You are Happy");
+		info1.setText("You are Sad0");
 		ImageView i;
 		i=(ImageView)findViewById(R.id.imageView2);
-		i.setImageResource(R.drawable.happy);
-		op="Angry";
+		i.setImageResource(R.drawable.sad);
+		op="Sad";
 		Log.i("output", op);
 		}
 		

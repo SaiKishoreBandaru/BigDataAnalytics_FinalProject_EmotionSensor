@@ -2,24 +2,36 @@ package com.example.whattodo;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.Scanner;
 
 //import com.umkc.googleChart.R;
 
 
+
+
 import android.app.Activity;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
+import android.util.Log;
 import android.view.View;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.ImageView;
 
 //import com.umkc.googleChart.R;
 
 public class Report extends Activity{
+	
+	
+	String response="";
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.report);
@@ -33,7 +45,21 @@ public class Report extends Activity{
     InputStream is = getResources().openRawResource(R.raw.data);
     
     BufferedReader br = new BufferedReader(new InputStreamReader(is));
-    
+	/*new Thread(new Runnable()
+	{
+
+	@Override
+	public void run() {
+		// TODO Auto-generated method stub
+		//String url ="http://134.193.136.127:8983/solr/collection1_shard1_replica1/select?q=state_s%3AAL&rows=100&wt=json&indent=true";
+		String url = "http://134.193.136.147:8080/HbaseWS/jaxrs/generic/hbaseRetrieveAll/KishoreLab3";
+		
+		BackgroundTask bt=new BackgroundTask();
+		bt.doInBackground(url);					
+	}
+	
+	}).start();*/
+	
 
 	String line;
 	try {
@@ -145,5 +171,85 @@ public class Report extends Activity{
     });
 	
     }	
+    
+    
+    public class BackgroundTask extends AsyncTask<String, String, String>{
+
+    	
+    	@Override
+        protected String doInBackground(String... params) {		   
+             String command=params[0]; // URL to call			                 
+         //    String response="";
+             
+         
+             try {   	  
+             response = executeCommand(command); 			         
+             	 
+            	 
+            	 Report.this.runOnUiThread(new Runnable() {
+    				
+    				@Override
+    				public void run() {
+    					
+    				     File sdCard = Environment.getExternalStorageDirectory();
+    				        File directory = new File (sdCard.getAbsolutePath() + "/Data");
+    				        if(!directory.exists())
+    				        directory.mkdirs();
+    				        String fname = "Data.txt";
+    				        File file = new File (directory, fname);
+    				        
+    				        try {
+    				            if(!file.exists())
+    				                file.createNewFile();
+    				               FileOutputStream out = new FileOutputStream(file,true);
+    				               out.write(response.getBytes());
+    				               out.flush();
+    				               out.close();
+
+    				        } catch (Exception e) {
+    				               e.printStackTrace();
+    				        }
+    				}
+    			});
+            	
+            	 
+             		         
+                 
+             }catch (Exception ex) {
+                 System.out.println("error!!");
+                 Log.i("url response", "IN Catch");
+                 ex.printStackTrace();
+             }
+            
+             return response; 
+        }
+    	
+    	private String executeCommand(String command) {
+    	   	 
+    		StringBuffer output = new StringBuffer();
+    		String output1="";
+    		String line="";
+    		try {
+    			
+    			 URL url = new URL(command);						
+    			 HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();         
+    	         BufferedReader br = new BufferedReader(new InputStreamReader((urlConnection.getInputStream())));
+    	         while ((line = br.readLine())!= null) {
+    					output.append(line + "\n");	
+    					if(line.contains("gesture is"))
+    					output1=line;
+    				}		
+    			
+     
+    		} catch (Exception e) {
+    			e.printStackTrace();
+    		}
+     
+    		return output1+output.toString();
+     
+    	}
+    	
+    	
+    }
 
 }

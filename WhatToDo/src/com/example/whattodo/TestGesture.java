@@ -30,7 +30,7 @@ public void	train() {
 	 myDir.mkdirs();
 	// Create HMM for punch gesture
 	Boolean exception =false;
-	int x=10;
+	int x=6;
 	while(!exception){
 	try{
     OpdfMultiGaussianFactory initFactoryPunch = new OpdfMultiGaussianFactory(
@@ -63,13 +63,13 @@ public void	train() {
 }
     // Create HMM for scroll-down gesture
 	Boolean exception1 =false;
-	int x1=10;
+	int x1=6;
 	while(!exception1){
 	try{
     OpdfMultiGaussianFactory initFactoryScrolldown = new OpdfMultiGaussianFactory(
             3);
 
-    Reader learnReaderScrolldown = new FileReader(new File (myDir, "Stomp.seq"));
+    Reader learnReaderScrolldown = new FileReader(new File (myDir, "HighFive.seq"));
     List<List<ObservationVector>> learnSequencesScrolldown = ObservationSequencesReader
             .readSequences(new ObservationVectorReader(),
                     learnReaderScrolldown);
@@ -98,7 +98,7 @@ public void	train() {
 	}
     // Create HMM for send gesture
 	Boolean exception2 =false;
-	int x2=10;
+	int x2=6;
 	while(!exception2){
 	try{
     OpdfMultiGaussianFactory initFactorySend = new OpdfMultiGaussianFactory(
@@ -128,6 +128,40 @@ public void	train() {
 		  
 	  }
 	}
+	
+	exception2 =false;
+	 x2=10;
+	while(!exception2){
+	try{
+    OpdfMultiGaussianFactory initFactorySend = new OpdfMultiGaussianFactory(
+            3);
+
+    Reader learnReaderSend = new FileReader(new File (myDir, "Angry.seq"));
+    List<List<ObservationVector>> learnSequencesSend = ObservationSequencesReader
+            .readSequences(new ObservationVectorReader(), learnReaderSend);
+    learnReaderSend.close();
+
+    KMeansLearner<ObservationVector> kMeansLearnerSend = new KMeansLearner<ObservationVector>(
+            x2, initFactorySend, learnSequencesSend);
+    // Create an estimation of the HMM (initHmm) using one iteration of the
+    // k-Means algorithm
+    Hmm<ObservationVector> initHmmSend = kMeansLearnerSend.iterate();
+
+    // Use BaumWelchLearner to create the HMM (learntHmm) from initHmm
+    BaumWelchLearner baumWelchLearnerSend = new BaumWelchLearner();
+     this.learntHmmSend = baumWelchLearnerSend.learn(
+            initHmmSend, learnSequencesSend);
+     exception2=true;
+     System.out.println(x2);
+	  }
+	  catch(Exception e){
+		  x2--;
+		  //System.out.println(x2);
+		  
+	  }
+	}
+	
+	
 	}
 	
     public String test(File seqfilename) throws Exception{
@@ -158,21 +192,25 @@ public void	train() {
                     || (gesture == 2 && sendProbability > scrolldownProbability)) {
                 gesture = 3;
             }
+            if ((gesture == 1 && sendProbability > punchProbability)
+                    || (gesture == 2 && sendProbability > scrolldownProbability)||(gesture==3 && scrolldownProbability> punchProbability)) {
+                gesture = 4;
+            }
             Log.i("probabilities", punchProbability + "   " + sendProbability  + "   " + scrolldownProbability);
             if (gesture == 1) {
-            	System.out.println("This is a punch gesture");
+            	System.out.println("This is a stomp gesture");
             	return "Irritated";
             } else if (gesture == 2) {
-                System.out.println("This is a face palm gesture");
-            	return "Sad";
+                System.out.println("This is a high five gesture");
+            	return "Happy";
             } else if (gesture == 3) {
-            	System.out.println("This is a punch gesture");
+            	System.out.println("This is a face palm gesture");
             	return "Worried";
             }else{
-            	return "Happy";
+            	return "Worried";
             }
         }
-		return "happy";
+		return "Sad";
     }
   
 } 
